@@ -1,4 +1,4 @@
-# @Nifty/merkle-distributor for comics 5,6 holders
+# @Nifty/merkle-distributor for comics 5,6
 
 # Local Development
 
@@ -16,8 +16,7 @@ The following assumes the use of `node@>=10`.
 
 `yarn test`
 
-## Generate Merkle Root for Comics 5,6 Token Holders
-
+## Generate Merkle Root for Comics 5,6 Token
 `yarn generate-merkle-root:comics56`
 
 ## Verify Merkle Root
