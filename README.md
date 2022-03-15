@@ -1,7 +1,4 @@
-# @uniswap/merkle-distributor
-
-[![Tests](https://github.com/Uniswap/merkle-distributor/workflows/Tests/badge.svg)](https://github.com/Uniswap/merkle-distributor/actions?query=workflow%3ATests)
-[![Lint](https://github.com/Uniswap/merkle-distributor/workflows/Lint/badge.svg)](https://github.com/Uniswap/merkle-distributor/actions?query=workflow%3ALint)
+# @Nifty/merkle-distributor for comics 5,6 holders
 
 # Local Development
 
@@ -19,9 +16,13 @@ The following assumes the use of `node@>=10`.
 
 `yarn test`
 
-## Generate Merkle Root for AXS Token Holders
+## Generate Merkle Root for Comics 5,6 Token Holders
 
-`yarn generate-merkle-root:axs`
+`yarn generate-merkle-root:comics56`
+
+## Verify Merkle Root
+
+`yarn verify-merkle-root`
 
 ## Run Hardhat Node
 
