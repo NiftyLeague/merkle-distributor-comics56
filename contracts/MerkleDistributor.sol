@@ -89,8 +89,8 @@ contract MerkleDistributor is IMerkleDistributor, ERC1155Holder, ReentrancyGuard
 
         // get the remaining token balance
         uint256[] memory balances = new uint256[](2);
-        balances[0] = claimableTokenAmount0.div(claimedTokenAmount0);
-        balances[1] = claimableTokenAmount1.div(claimedTokenAmount1);
+        balances[0] = claimableTokenAmount0.sub(claimedTokenAmount0);
+        balances[1] = claimableTokenAmount1.sub(claimedTokenAmount1);
         
         // transfer ERC1155 to the beneficiary
         IERC1155(token).safeBatchTransferFrom(address(this), _beneficiary, tokenIds, balances, bytes(""));
