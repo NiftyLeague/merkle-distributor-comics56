@@ -4,10 +4,10 @@ import fs from 'fs';
 import ethProvider from 'eth-provider';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-const COSMIC_5_CLAIMABLE_TOKEN_AMOUNT = 10000;
-const COSMIC_6_CLAIMABLE_TOKEN_AMOUNT = 10000;
+const COMIC_5_CLAIMABLE_TOKEN_AMOUNT = 9900;
+const COMIC_6_CLAIMABLE_TOKEN_AMOUNT = 1200;
 const IDS = [5, 6];
-const CLAIMABLE_AMOUNTS = [COSMIC_5_CLAIMABLE_TOKEN_AMOUNT, COSMIC_6_CLAIMABLE_TOKEN_AMOUNT];
+const CLAIMABLE_AMOUNTS = [COMIC_5_CLAIMABLE_TOKEN_AMOUNT, COMIC_6_CLAIMABLE_TOKEN_AMOUNT];
 
 const NIFTY_DAO_SAFE = '0xd06Ae6fB7EaDe890f3e295D69A6679380C9456c1';
 
@@ -27,7 +27,8 @@ const getToken = async () => {
   if (fs.existsSync(addressPath)) {
     const abi = JSON.parse(fs.readFileSync('./COMICS/abi.json', { encoding: 'utf8' }));
     const comicsAddress = fs.readFileSync(addressPath).toString();
-    const signer = (await ethers.getSigners())[0];
+    // const signer = (await ethers.getSigners())[0];
+    const signer = await getLedgerSigner();
     token = await ethers.getContractAt(abi, comicsAddress, signer);
     await token.deployed();
     console.log('Using token deployed at ', token.address);
@@ -60,19 +61,32 @@ const tenderlyVerify = async ({ contractName, contractAddress }: { contractName:
 
 const deployDistributor = async (token: Contract) => {
   const Distributor = await ethers.getContractFactory('MerkleDistributor', {
-    ...(targetNetwork !== 'localhost' && { signer: (await ethers.getSigners())[0] }),
+    // ...(targetNetwork !== 'localhost' && { signer: (await ethers.getSigners())[0] }),
+    ...(targetNetwork !== 'localhost' && { signer: await getLedgerSigner() }),
   });
   const tree = JSON.parse(fs.readFileSync('data/result.json', { encoding: 'utf8' }));
   console.log('token.address:', token.address);
   console.log('tree.merkleRoot:', tree.merkleRoot);
-  const distributor = await Distributor.deploy(token.address, COSMIC_5_CLAIMABLE_TOKEN_AMOUNT, COSMIC_6_CLAIMABLE_TOKEN_AMOUNT, tree.merkleRoot, NIFTY_DAO_SAFE);
+  const distributor = await Distributor.deploy(
+    token.address,
+    COMIC_5_CLAIMABLE_TOKEN_AMOUNT,
+    COMIC_6_CLAIMABLE_TOKEN_AMOUNT,
+    tree.merkleRoot,
+    NIFTY_DAO_SAFE
+  );
   console.log(` 🛰  MerkleDistributor Deployed to: ${targetNetwork} ${distributor.address}`);
   if (targetNetwork !== 'localhost') {
     await distributor.deployTransaction.wait(5);
     console.log(` 📁 Attempting etherscan verification of ${distributor.address} on ${targetNetwork}`);
     await run('verify:verify', {
       address: distributor.address,
-      constructorArguments: [token.address, COSMIC_5_CLAIMABLE_TOKEN_AMOUNT, COSMIC_6_CLAIMABLE_TOKEN_AMOUNT, tree.merkleRoot, NIFTY_DAO_SAFE],
+      constructorArguments: [
+        token.address,
+        COMIC_5_CLAIMABLE_TOKEN_AMOUNT,
+        COMIC_6_CLAIMABLE_TOKEN_AMOUNT,
+        tree.merkleRoot,
+        NIFTY_DAO_SAFE,
+      ],
     });
     await tenderlyVerify({ contractName: 'MerkleDistributor', contractAddress: distributor.address });
   }
@@ -93,8 +107,8 @@ const postDeploy = async (distributor: Contract, token: Contract) => {
 };
 
 async function main() {
-  let accounts: SignerWithAddress[] = await ethers.getSigners();
-  console.log('deployer address: ', accounts[0].address);
+  // let accounts: SignerWithAddress[] = await ethers.getSigners();
+  // console.log('deployer address: ', accounts[0].address);
 
   const token = await getToken();
   if (token) {
